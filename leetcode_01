@@ -1,0 +1,107 @@
+```c
+/**
+ * Note: The returned array must be malloced, assume caller calls free().
+ */
+int* twoSum(int* nums, int numsSize, int target, int* returnSize){
+
+    // 表存資料數據的node
+    struct data_node{
+        struct data_node *next;	
+        int value;		  //value
+        int index;      //index
+    };
+
+    // Hash 表結構體定義
+    typedef struct Hash_Node{
+        struct data_node *p;	
+    }hash_node;
+
+    hash_node* HashTable = (hash_node*)malloc(numsSize * sizeof(hash_node));//宣告一個hashtable
+    if (HashTable == NULL){
+        *returnSize = 0;
+        return NULL;
+    }  
+
+    void InitHashTable(hash_node *HashTable){
+        //參數初始化
+        for(int i = 0; i < numsSize; i++){
+            HashTable[i].p = NULL;
+        }
+    }
+
+    int savedata(struct data_node **head, int num ,int i){
+            struct data_node *temp_p = *head;
+            struct data_node *s = (struct data_node *)malloc(sizeof(struct data_node));
+            if(s == NULL){
+                return -1;
+            }
+            s->index = i;
+            s->value = num;
+            s->next = NULL;
+
+            if(*head == NULL){
+                *head = s;
+            }
+            else{ //如果該hashtable格子不為空,則應該添加到link list尾端   
+            
+                while(temp_p != NULL){
+                    if(temp_p->next == NULL)
+                            break;
+                    temp_p =temp_p->next;     
+                }
+                temp_p->next = s;
+            }
+        return 0;
+    }
+
+    int add_hash(hash_node *HashTable, int num, int i){
+       
+        int sum = num % numsSize;
+
+        if(sum < 0){
+            sum *= -1;
+        }
+        return savedata(&HashTable[sum].p, num, i);
+    }
+
+
+// hash table 製作完成
+
+InitHashTable(HashTable);
+
+int *result = (int*)malloc(2*sizeof(int));
+if (result == NULL){
+    *returnSize = 0;
+    return NULL;
+}
+
+for(int i=0;i < numsSize; i++){//把資料添加到hash table
+add_hash(HashTable, nums[i], i);
+}
+
+struct data_node* pointerToData;
+int need = 0;
+
+for(int i=0;i < numsSize; i++){
+    need = (target - nums[i]) % numsSize;
+    if(need < 0){
+        need *= -1;
+    }
+    pointerToData = HashTable[need].p;
+
+    while(pointerToData != NULL){
+        if(nums[i] + pointerToData->value == target && i != pointerToData->index){
+        result[1] = pointerToData->index;
+        result[0] = i;
+        *returnSize = 2;
+        return result;
+        }
+        pointerToData = pointerToData->next;
+    }
+
+}
+        *returnSize=0;
+        return 0 ; 
+
+}//int* twoSum
+```
